@@ -4,203 +4,194 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate SA ID Numbers</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      background-color: #f5f5f5;
       margin: 0;
       padding: 0;
     }
 
     .container {
-      width: 80%;
-      margin: 20px auto;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 60%;
+      margin: auto;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     h3 {
       text-align: center;
-      color: #333;
-    }
-
-    label {
-      font-weight: bold;
-      font-size: 16px;
     }
 
     .input-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
-    select, input[type="number"], button {
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    select, input[type="radio"], input[type="number"] {
       width: 100%;
-      padding: 15px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      margin-top: 10px;
+      padding: 10px;
+      font-size: 1.2rem;
     }
 
-    button {
-      background-color: #007bff;
+    #loadingBar {
+      display: none;
+      width: 100%;
+      background-color: #ccc;
+      height: 20px;
+    }
+
+    #loadingBarProgress {
+      width: 0;
+      height: 100%;
+      background-color: #4caf50;
+      text-align: center;
       color: white;
+    }
+
+    .btn {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
       border: none;
       cursor: pointer;
+      font-size: 1.2rem;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    .btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
 
     #result {
-      margin-top: 20px;
-      background-color: #d9edf7;
+      background-color: #e0f7fa;
       padding: 10px;
-      border-radius: 5px;
-      color: #31708f;
+      margin-top: 15px;
+      font-size: 1.2rem;
     }
   </style>
-
-  <script>
-    function calculateCheckDigit(digitsAsString) {
-      const digits = digitsAsString.split('').map(d => Number(d));
-      let sum = 0;
-
-      for (let i = 0; i < digits.length; i++) {
-        let digit = digits[i];
-        if (i % 2 !== 0) {
-          digit *= 2;
-          if (digit > 9) digit -= 9;
-        }
-        sum += digit;
-      }
-
-      return (10 - (sum % 10)) % 10;
-    }
-
-    function generateRandomNumber(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function generateIdNumber(year, month, day, genderCode) {
-      // Generate random GSSS (Sequence number: 0000-4999 for females, 5000-9999 for males)
-      const sequenceNumber = genderCode === 'female' ? generateRandomNumber(0, 4999).toString().padStart(4, '0') :
-        generateRandomNumber(5000, 9999).toString().padStart(4, '0');
-
-      const citizenship = generateRandomNumber(0, 1); // Randomly 0 or 1
-      const raceIndicator = generateRandomNumber(8, 9); // Randomly 8 or 9
-
-      const idWithoutCheckDigit = `${year}${month}${day}${sequenceNumber}${citizenship}${raceIndicator}`;
-      const checkDigit = calculateCheckDigit(idWithoutCheckDigit);
-
-      return idWithoutCheckDigit + checkDigit;
-    }
-
-    function showSingleId() {
-      const form = document.forms.f1;
-      const year = form.year.value.slice(2);
-      const month = form.month.value.padStart(2, '0');
-      const day = form.day.value.padStart(2, '0');
-      const gender = form.gender.value;
-
-      const idNumber = generateIdNumber(year, month, day, gender);
-      document.getElementById('result').innerHTML = `<p><strong>Generated ID:</strong> ${idNumber}</p>`;
-    }
-
-    function generateMultipleIds() {
-      const form = document.forms.f1;
-      const year = form.year.value.slice(2);
-      const month = form.month.value.padStart(2, '0');
-      const day = form.day.value.padStart(2, '0');
-      const idCount = document.getElementById('idCount').value;
-
-      const ids = [];
-
-      for (let i = 0; i < idCount; i++) {
-        const gender = Math.random() > 0.5 ? 'female' : 'male';
-        const idNumber = generateIdNumber(year, month, day, gender);
-        ids.push(idNumber);
-      }
-
-      const file = new Blob([ids.join('\n')], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(file);
-      a.download = 'generated-ids.txt';
-      a.click();
-    }
-
-    function addOptions(id, from, to, defaultValue) {
-      const selectElement = document.getElementById(id);
-      const values = Array.from({ length: to - from + 1 }, (_, i) => i + from);
-      const options = values.map(v => {
-        const isDefault = defaultValue && defaultValue === String(v);
-        return `<option value="${v}" ${isDefault ? 'selected="selected"' : ''}>${v}</option>`;
-      }).join('');
-      selectElement.innerHTML = options;
-    }
-
-    window.onload = () => {
-      const year = new Date().getFullYear();
-      addOptions('year', 1900, year, year);
-      addOptions('month', 1, 12);
-      addOptions('day', 1, 31);
-    };
-  </script>
-
 </head>
 <body>
 
-  <div class="container">
-    <h3>Generate (Fake) South-African ID Numbers</h3>
+<div class="container">
+  <h3>Generate South-African ID Numbers</h3>
 
-    <form id="f1" name="f1" onsubmit="showSingleId(); return false">
-      <div class="input-group">
-        <label for="year">Year of Birth</label>
-        <select id="year" name="year"></select>
-      </div>
-      <div class="input-group">
-        <label for="month">Month of Birth</label>
-        <select id="month" name="month"></select>
-      </div>
-      <div class="input-group">
-        <label for="day">Day of Birth</label>
-        <select id="day" name="day"></select>
-      </div>
+  <form id="f1" name="f1" onsubmit="showIdNumber(); return false">
+    <div class="input-group">
+      <label for="year">Year of Birth</label>
+      <select id="year" name="year"></select>
+    </div>
+    <div class="input-group">
+      <label for="month">Month of Birth</label>
+      <select id="month" name="month"></select>
+    </div>
+    <div class="input-group">
+      <label for="day">Day of Birth</label>
+      <select id="day" name="day"></select>
+    </div>
+    <div class="input-group">
+      <input type="radio" name="gender" id="female" value="4" checked="checked" />
+      <label for="female">Female</label><br>
+      <input type="radio" name="gender" id="male" value="5" />
+      <label for="male">Male</label>
+    </div>
 
-      <div class="input-group">
-        <input type="radio" name="gender" id="female" value="female" checked />
-        <label for="female">Female</label><br />
-        <input type="radio" name="gender" id="male" value="male" />
-        <label for="male">Male</label>
-      </div>
+    <!-- Moved section here -->
+    <div class="input-group">
+      <button class="btn" type="submit">Generate Single ID</button>
+      <div id="result">Generated ID: </div>
+    </div>
+  </form>
 
-      <div class="input-group">
-        <label for="idCount">Number of IDs to generate (for file export)</label>
-        <input type="number" id="idCount" min="1" />
-      </div>
+  <h3>Generate Multiple IDs</h3>
+  <input type="number" id="numberOfIds" placeholder="Enter number of IDs to generate" min="1" max="1000">
+  <button class="btn" onclick="generateMultipleIds()">Export Multiple IDs to Textfile</button>
 
-      <button type="submit">Generate Single ID</button>
-      <button type="button" onclick="generateMultipleIds()">Generate Multiple IDs</button>
-    </form>
-
-    <div id="result">Hint: submit the form to get an ID number.</div>
-
-    <h3>How South African ID Numbers Work</h3>
-    <p>The ID number format is: YYMMDDGSSSCAZ, where:</p>
-    <ul>
-      <li><strong>YYMMDD</strong>: Date of birth</li>
-      <li><strong>G</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
-      <li><strong>SSS</strong>: Daily sequence number</li>
-      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for permanent residents)</li>
-      <li><strong>A</strong>: Race indicator (8 or 9)</li>
-      <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
-    </ul>
+  <div id="loadingBar">
+    <div id="loadingBarProgress">0%</div>
   </div>
+
+</div>
+
+<script>
+  const year = new Date().getFullYear();
+  
+  // Adds options for year dropdown with age in brackets
+  function addOptionsForYear() {
+    let select = document.getElementById("year");
+    for (let i = 2024; i >= 1900; i--) {
+      let age = year - i;
+      let option = document.createElement("option");
+      option.value = i;
+      option.text = `${i} (~${age} years)`;
+      select.appendChild(option);
+    }
+  }
+
+  // Adds options for month dropdown with month name in brackets
+  function addOptionsForMonth() {
+    let months = ["01 (January)", "02 (February)", "03 (March)", "04 (April)", "05 (May)", "06 (June)", 
+                  "07 (July)", "08 (August)", "09 (September)", "10 (October)", "11 (November)", "12 (December)"];
+    let select = document.getElementById("month");
+    for (let i = 1; i <= 12; i++) {
+      let option = document.createElement("option");
+      option.value = i < 10 ? '0' + i : i;
+      option.text = months[i - 1];
+      select.appendChild(option);
+    }
+  }
+
+  function addOptionsForDay() {
+    let select = document.getElementById("day");
+    for (let i = 1; i <= 31; i++) {
+      let option = document.createElement("option");
+      option.value = i < 10 ? '0' + i : i;
+      option.text = i;
+      select.appendChild(option);
+    }
+  }
+
+  addOptionsForYear();
+  addOptionsForMonth();
+  addOptionsForDay();
+
+  // Generate a single ID
+  function showIdNumber() {
+    // The logic for generating a single ID goes here
+  }
+
+  // Generate multiple IDs
+  function generateMultipleIds() {
+    let numIds = document.getElementById("numberOfIds").value;
+    if (numIds < 1 || numIds > 1000) {
+      alert("Please enter a number between 1 and 1000.");
+      return;
+    }
+
+    // Show loading bar
+    let loadingBar = document.getElementById("loadingBar");
+    loadingBar.style.display = "block";
+
+    let loadingBarProgress = document.getElementById("loadingBarProgress");
+    let progress = 0;
+    let interval = setInterval(() => {
+      if (progress >= 100) {
+        clearInterval(interval);
+        // The logic for exporting IDs to a text file goes here
+        loadingBar.style.display = "none";
+      } else {
+        progress += 10;
+        loadingBarProgress.style.width = progress + "%";
+        loadingBarProgress.textContent = progress + "%";
+      }
+    }, 500);
+  }
+</script>
 
 </body>
 </html>

@@ -17,9 +17,9 @@
       width: 80%;
       margin: 20px auto;
       background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
 
     h3 {
@@ -29,10 +29,32 @@
 
     label {
       font-weight: bold;
+      font-size: 16px;
     }
 
     .input-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    select, input[type="number"], button {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
     }
 
     #result {
@@ -42,87 +64,66 @@
       border-radius: 5px;
       color: #31708f;
     }
-
-    #expertOptions {
-      background-color: #f5f5f5;
-      padding: 10px;
-      margin-top: 20px;
-      border-radius: 5px;
-    }
-
-    #showExpertOptions a {
-      cursor: pointer;
-      color: #337ab7;
-      text-decoration: none;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      text-align: center;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn:hover {
-      background-color: #0056b3;
-    }
-
-    textarea {
-      width: 100%;
-      height: 200px;
-    }
   </style>
 
   <script>
     function calculateCheckDigit(digitsAsString) {
-      const digits = digitsAsString.replace(/\D/g, '').split('').map(d => Number(d));
-      const checkSum = digits.reverse().map((d, ix) => {
-        if (ix % 2 === 0) {
-          d *= 2;
-          if (d > 9) d -= 9;
+      const digits = digitsAsString.split('').map(d => Number(d));
+      let sum = 0;
+
+      for (let i = 0; i < digits.length; i++) {
+        let digit = digits[i];
+        if (i % 2 !== 0) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
         }
-        return d;
-      }).reduce((memo, d) => memo += d, 0);
-      return checkSum * 9 % 10;
+        sum += digit;
+      }
+
+      return (10 - (sum % 10)) % 10;
     }
 
-    function showIdNumber() {
+    function generateRandomNumber(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateIdNumber(year, month, day, genderCode) {
+      // Generate random GSSS (Sequence number: 0000-4999 for females, 5000-9999 for males)
+      const sequenceNumber = genderCode === 'female' ? generateRandomNumber(0, 4999).toString().padStart(4, '0') :
+        generateRandomNumber(5000, 9999).toString().padStart(4, '0');
+
+      const citizenship = generateRandomNumber(0, 1); // Randomly 0 or 1
+      const raceIndicator = generateRandomNumber(8, 9); // Randomly 8 or 9
+
+      const idWithoutCheckDigit = `${year}${month}${day}${sequenceNumber}${citizenship}${raceIndicator}`;
+      const checkDigit = calculateCheckDigit(idWithoutCheckDigit);
+
+      return idWithoutCheckDigit + checkDigit;
+    }
+
+    function showSingleId() {
       const form = document.forms.f1;
-      const values = [
-        form.year, form.month, form.day,
-        form.gender,
-        { value: form.sequence.value || '896' },
-        { value: form.cship.value || '0' },
-        { value: '8' }
-      ];
+      const year = form.year.value.slice(2);
+      const month = form.month.value.padStart(2, '0');
+      const day = form.day.value.padStart(2, '0');
+      const gender = form.gender.value;
 
-      const withoutCheckDigit = values.map(e => e.value).join('');
-      const idNumber = withoutCheckDigit + calculateCheckDigit(withoutCheckDigit);
-
+      const idNumber = generateIdNumber(year, month, day, gender);
       document.getElementById('result').innerHTML = `<p><strong>Generated ID:</strong> ${idNumber}</p>`;
     }
 
     function generateMultipleIds() {
       const form = document.forms.f1;
-      const numberOfIds = document.getElementById('idCount').value;
+      const year = form.year.value.slice(2);
+      const month = form.month.value.padStart(2, '0');
+      const day = form.day.value.padStart(2, '0');
+      const idCount = document.getElementById('idCount').value;
+
       const ids = [];
 
-      for (let i = 0; i < numberOfIds; i++) {
-        const values = [
-          form.year, form.month, form.day,
-          form.gender,
-          { value: form.sequence.value || '896' },
-          { value: form.cship.value || '0' },
-          { value: '8' }
-        ];
-
-        const withoutCheckDigit = values.map(e => e.value).join('');
-        const idNumber = withoutCheckDigit + calculateCheckDigit(withoutCheckDigit);
+      for (let i = 0; i < idCount; i++) {
+        const gender = Math.random() > 0.5 ? 'female' : 'male';
+        const idNumber = generateIdNumber(year, month, day, gender);
         ids.push(idNumber);
       }
 
@@ -131,11 +132,6 @@
       a.href = URL.createObjectURL(file);
       a.download = 'generated-ids.txt';
       a.click();
-    }
-
-    function showExpertOptions() {
-      document.getElementById('showExpertOptions').style.display = 'none';
-      document.getElementById('expertOptions').style.display = 'block';
     }
 
     function addOptions(id, from, to, defaultValue) {
@@ -150,10 +146,9 @@
 
     window.onload = () => {
       const year = new Date().getFullYear();
-      addOptions('year', 1900, year);
+      addOptions('year', 1900, year, year);
       addOptions('month', 1, 12);
       addOptions('day', 1, 31);
-      addOptions('sequence', 0, 999, '800');
     };
   </script>
 
@@ -163,7 +158,7 @@
   <div class="container">
     <h3>Generate (Fake) South-African ID Numbers</h3>
 
-    <form id="f1" name="f1" onsubmit="showIdNumber(); return false">
+    <form id="f1" name="f1" onsubmit="showSingleId(); return false">
       <div class="input-group">
         <label for="year">Year of Birth</label>
         <select id="year" name="year"></select>
@@ -176,60 +171,36 @@
         <label for="day">Day of Birth</label>
         <select id="day" name="day"></select>
       </div>
+
       <div class="input-group">
-        <input type="radio" name="gender" id="female" value="4" checked />
+        <input type="radio" name="gender" id="female" value="female" checked />
         <label for="female">Female</label><br />
-        <input type="radio" name="gender" id="male" value="5" />
+        <input type="radio" name="gender" id="male" value="male" />
         <label for="male">Male</label>
       </div>
 
-      <div id="showExpertOptions">
-        <a onclick="showExpertOptions()">Show expert options</a>
-      </div>
-
-      <div style="display: none;" id="expertOptions">
-        <div class="input-group">
-          <label for="sequence">Sequence</label>
-          <select id="sequence" name="sequence"></select>
-        </div>
-        <div class="input-group">
-          <input type="radio" name="cship" id="citizen" value="0" checked />
-          <label for="citizen">Citizen</label><br />
-          <input type="radio" name="cship" id="resident" value="1" />
-          <label for="resident">Resident</label>
-        </div>
-      </div>
-
       <div class="input-group">
-        <label for="idCount">Number of IDs to generate</label>
-        <input type="number" id="idCount" class="form-control" min="1" />
+        <label for="idCount">Number of IDs to generate (for file export)</label>
+        <input type="number" id="idCount" min="1" />
       </div>
 
-      <button class="btn" type="submit">Generate Single ID</button>
-      <button class="btn" type="button" onclick="generateMultipleIds()">Generate Multiple IDs</button>
+      <button type="submit">Generate Single ID</button>
+      <button type="button" onclick="generateMultipleIds()">Generate Multiple IDs</button>
     </form>
 
     <div id="result">Hint: submit the form to get an ID number.</div>
 
-    <h3>More Information</h3>
-
-    <p>South African ID numbers follow the format:</p>
-
-    <p id="latex"></p>
-
-    <p>The formula for generating ID numbers is \( \text{ID} = YYMMDDGSSSCA \), where:</p>
+    <h3>How South African ID Numbers Work</h3>
+    <p>The ID number format is: YYMMDDGSSSCAZ, where:</p>
     <ul>
-      <li>\( YYMMDD \) is the date of birth.</li>
-      <li>\( G \) is gender (4 for females and 5 for males).</li>
-      <li>\( SSS \) is a daily sequence number.</li>
-      <li>\( C \) indicates citizenship (0 for citizens, 1 for residents).</li>
-      <li>\( A \) is a checksum calculated using the Luhn algorithm.</li>
+      <li><strong>YYMMDD</strong>: Date of birth</li>
+      <li><strong>G</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
+      <li><strong>SSS</strong>: Daily sequence number</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for permanent residents)</li>
+      <li><strong>A</strong>: Race indicator (8 or 9)</li>
+      <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
     </ul>
   </div>
-
-  <!-- MathJax for LaTeX -->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 </body>
 </html>

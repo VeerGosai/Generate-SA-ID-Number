@@ -5,16 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate SA ID Numbers</title>
 
-  <!-- Re-adding Bootstrap CSS for the original look -->
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
-
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    select, input[type="number"], button {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      background-color: #d9edf7;
+      padding: 10px;
+      border-radius: 5px;
+      color: #31708f;
+    }
+
     #loadingBar {
       display: none;
       width: 100%;
       background-color: #ccc;
       height: 20px;
       margin-top: 10px;
+      border-radius: 5px;
     }
 
     #loadingBarProgress {
@@ -23,6 +80,7 @@
       background-color: #4caf50;
       text-align: center;
       color: white;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -31,6 +89,7 @@
 <div class="container">
   <h3>Generate South-African ID Numbers</h3>
 
+  <!-- Form for Single ID generation -->
   <form id="f1" name="f1" onsubmit="showIdNumber(); return false">
     <div class="input-group">
       <label for="year">Year of Birth</label>
@@ -47,6 +106,7 @@
       <select id="day" name="day" class="form-control"></select>
     </div>
 
+    <!-- Gender selection with "Generate Single ID" button and result -->
     <div class="input-group">
       <input type="radio" name="gender" id="female" value="4" checked="checked" />
       <label for="female">Female</label>
@@ -57,10 +117,12 @@
 
     <div class="input-group">
       <button class="btn btn-primary" type="submit">Generate Single ID</button>
-      <div id="result" class="alert alert-info" style="margin-top: 10px;">Generated ID: </div>
     </div>
+
+    <div id="result" class="alert">Generated ID: </div>
   </form>
 
+  <!-- Section for multiple ID generation -->
   <h3>Generate Multiple IDs</h3>
   <div class="input-group">
     <input type="number" id="numberOfIds" class="form-control" placeholder="Enter number of IDs to generate" min="1" max="1000">
@@ -72,10 +134,6 @@
     <div id="loadingBarProgress">0%</div>
   </div>
 </div>
-
-<!-- Bootstrap JS for the original styling -->
-<script src="https://code.jquery.com/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
 <script>
   const year = new Date().getFullYear();

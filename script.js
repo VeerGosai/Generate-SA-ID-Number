@@ -33,37 +33,66 @@ function calculateCheckDigit(digitsAsString) {
   
   function showSingleId() {
     const form = document.forms.f1;
-    const year = form.year.value.slice(2); 
-    const month = form.month.value.padStart(2, '0');
-    const day = form.day.value.padStart(2, '0');
+    
+    const year = document.getElementById('randomYear').checked 
+        ? generateRandomNumber(1900, new Date().getFullYear()).toString().slice(2) 
+        : form.year.value.slice(2); 
+
+    const month = document.getElementById('randomMonth').checked 
+        ? generateRandomNumber(1, 12).toString().padStart(2, '0') 
+        : form.month.value.padStart(2, '0');
+    
+    const day = document.getElementById('randomDay').checked 
+        ? generateRandomNumber(1, 31).toString().padStart(2, '0') 
+        : form.day.value.padStart(2, '0');
+
     const gender = form.gender.value;
-  
+
     const idNumber = generateIdNumber(year, month, day, gender);
     document.getElementById('result').innerHTML = `<p><strong>Generated ID:</strong> ${idNumber}</p>`;
   }
+
   
-  function generateMultipleIds() {
-    const form = document.forms.f1;
-    const year = form.year.value.slice(2);
-    const month = form.month.value.padStart(2, '0');
-    const day = form.day.value.padStart(2, '0');
-    const idCount = document.getElementById('idCount').value;
-  
-    const ids = [];
-  
-    for (let i = 0; i < idCount; i++) {
-      const gender = Math.random() > 0.5 ? 'female' : 'male';
-      const idNumber = generateIdNumber(year, month, day, gender);
-      ids.push(idNumber);
-    }
-  
-    const file = new Blob([ids.join('\n')], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(file);
-    a.download = 'generated-ids.txt';
-    a.click();
+  function generateRandomYear() {
+    return generateRandomNumber(1900, new Date().getFullYear()).toString().slice(2);
   }
-  
+
+  function generateRandomMonth() {
+      return generateRandomNumber(1, 12).toString().padStart(2, '0');
+  }
+
+  function generateRandomDay() {
+      return generateRandomNumber(1, 31).toString().padStart(2, '0');
+  }
+
+  function generateMultipleIds() {
+      const form = document.forms.f1;
+      const idCount = document.getElementById('idCount').value;
+
+      const randomYearChecked = document.getElementById('randomYear').checked;
+      const randomMonthChecked = document.getElementById('randomMonth').checked;
+      const randomDayChecked = document.getElementById('randomDay').checked;
+
+      const ids = [];
+
+      for (let i = 0; i < idCount; i++) {
+          const year = randomYearChecked ? generateRandomYear() : form.year.value.slice(2);
+          const month = randomMonthChecked ? generateRandomMonth() : form.month.value.padStart(2, '0');
+          const day = randomDayChecked ? generateRandomDay() : form.day.value.padStart(2, '0');
+          
+          const gender = Math.random() > 0.5 ? 'female' : 'male';
+          const idNumber = generateIdNumber(year, month, day, gender);
+          ids.push(idNumber);
+      }
+
+      const file = new Blob([ids.join('\n')], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(file);
+      a.download = 'generated-ids.txt';
+      a.click();
+  }
+
+    
   function addYearOptions(id, from, to) {
     const selectElement = document.getElementById(id);
     const currentYear = new Date().getFullYear();
@@ -122,4 +151,5 @@ function calculateCheckDigit(digitsAsString) {
     updateYearDisplay(); 
     updateMonthDisplay(); 
   };
+  
   

@@ -34,7 +34,7 @@ function calculateCheckDigit(digitsAsString) {
   
   function showSingleId() {
     const form = document.forms.f1;
-    const year = form.year.value.slice(2);
+    const year = form.year.value.slice(2); // Extract last 2 digits of the year
     const month = form.month.value.padStart(2, '0');
     const day = form.day.value.padStart(2, '0');
     const gender = form.gender.value;
@@ -65,23 +65,17 @@ function calculateCheckDigit(digitsAsString) {
     a.click();
   }
   
-  function updateYearDisplay() {
-    const year = document.getElementById('year').value;
+  function addYearOptions(id, from, to) {
+    const selectElement = document.getElementById(id);
     const currentYear = new Date().getFullYear();
-    const age = currentYear - year;
-  
-    // Display the year and age in the format "2024 (~0 Years Old)"
-    const yearDisplay = document.getElementById('yearDisplay');
-    yearDisplay.innerHTML = `${year} (~${age} Years Old)`;
-  }
-  
-  function updateMonthDisplay() {
-    const month = document.getElementById('month').value;
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     
-    // Display the month in the format "1 (January)"
-    const monthDisplay = document.getElementById('monthDisplay');
-    monthDisplay.innerHTML = `${month} (${monthNames[month - 1]})`;
+    let options = '';
+    for (let year = to; year >= from; year--) {
+      const age = currentYear - year;
+      options += `<option value="${year}">${year} (~${age} years old)</option>`;
+    }
+    
+    selectElement.innerHTML = options;
   }
   
   function addOptions(id, from, to, defaultValue) {
@@ -94,9 +88,35 @@ function calculateCheckDigit(digitsAsString) {
     selectElement.innerHTML = options;
   }
   
+  function updateYearDisplay() {
+    const yearSelect = document.getElementById('year');
+    const selectedYear = yearSelect.value;
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - selectedYear;
+    const yearText = `${selectedYear} (~${age} years old)`;
+  
+    const yearOption = yearSelect.querySelector(`option[value="${selectedYear}"]`);
+    if (yearOption) {
+      yearOption.textContent = yearText;
+    }
+  }
+  
+  function updateMonthDisplay() {
+    const monthSelect = document.getElementById('month');
+    const monthNames = ["January", "February", "March", "April", "May", "June", 
+                        "July", "August", "September", "October", "November", "December"];
+    const selectedMonth = parseInt(monthSelect.value, 10);
+    const monthText = `${selectedMonth} (${monthNames[selectedMonth - 1]})`;
+  
+    const monthOption = monthSelect.querySelector(`option[value="${selectedMonth}"]`);
+    if (monthOption) {
+      monthOption.textContent = monthText;
+    }
+  }
+  
   window.onload = () => {
     const year = new Date().getFullYear();
-    addOptions('year', 1900, year, year);
+    addYearOptions('year', 1900, year); // Add year options with year and age display
     addOptions('month', 1, 12);
     addOptions('day', 1, 31);
   

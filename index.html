@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate SA ID Numbers</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <script src="script.js"></script>
 </head>
 <body>
 
@@ -14,11 +17,13 @@
     <form id="f1" name="f1" onsubmit="showSingleId(); return false">
       <div class="input-group">
         <label for="year">Year of Birth</label>
-        <select id="year" name="year"></select>
+        <select id="year" name="year" onchange="updateYearDisplay()"></select>
+        <p id="yearDisplay"></p> <!-- Display the year and age -->
       </div>
       <div class="input-group">
         <label for="month">Month of Birth</label>
-        <select id="month" name="month"></select>
+        <select id="month" name="month" onchange="updateMonthDisplay()"></select>
+        <p id="monthDisplay"></p> <!-- Display the month with name -->
       </div>
       <div class="input-group">
         <label for="day">Day of Birth</label>
@@ -55,6 +60,5 @@
     </ul>
   </div>
 
-  <script src="script.js"></script>
 </body>
 </html>

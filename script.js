@@ -19,12 +19,12 @@ function calculateCheckDigit(digitsAsString) {
   }
   
   function generateIdNumber(year, month, day, genderCode) {
-    const sequenceNumber = genderCode === 'female' 
-      ? generateRandomNumber(0, 4999).toString().padStart(4, '0') 
-      : generateRandomNumber(5000, 9999).toString().padStart(4, '0');
+    // Generate random GSSS (Sequence number: 0000-4999 for females, 5000-9999 for males)
+    const sequenceNumber = genderCode === 'female' ? generateRandomNumber(0, 4999).toString().padStart(4, '0') :
+      generateRandomNumber(5000, 9999).toString().padStart(4, '0');
   
-    const citizenship = generateRandomNumber(0, 1);
-    const raceIndicator = generateRandomNumber(8, 9);
+    const citizenship = generateRandomNumber(0, 1); // Randomly 0 or 1
+    const raceIndicator = generateRandomNumber(8, 9); // Randomly 8 or 9
   
     const idWithoutCheckDigit = `${year}${month}${day}${sequenceNumber}${citizenship}${raceIndicator}`;
     const checkDigit = calculateCheckDigit(idWithoutCheckDigit);
@@ -65,6 +65,25 @@ function calculateCheckDigit(digitsAsString) {
     a.click();
   }
   
+  function updateYearDisplay() {
+    const year = document.getElementById('year').value;
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - year;
+  
+    // Display the year and age in the format "2024 (~0 Years Old)"
+    const yearDisplay = document.getElementById('yearDisplay');
+    yearDisplay.innerHTML = `${year} (~${age} Years Old)`;
+  }
+  
+  function updateMonthDisplay() {
+    const month = document.getElementById('month').value;
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+    // Display the month in the format "1 (January)"
+    const monthDisplay = document.getElementById('monthDisplay');
+    monthDisplay.innerHTML = `${month} (${monthNames[month - 1]})`;
+  }
+  
   function addOptions(id, from, to, defaultValue) {
     const selectElement = document.getElementById(id);
     const values = Array.from({ length: to - from + 1 }, (_, i) => i + from);
@@ -77,8 +96,5 @@ function calculateCheckDigit(digitsAsString) {
   
   window.onload = () => {
     const year = new Date().getFullYear();
-    addOptions('year', 1900, year, year);
-    addOptions('month', 1, 12);
-    addOptions('day', 1, 31);
-  };
+    addOptions('year', 1900, year, year
   

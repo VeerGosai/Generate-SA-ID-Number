@@ -96,5 +96,11 @@ function calculateCheckDigit(digitsAsString) {
   
   window.onload = () => {
     const year = new Date().getFullYear();
-    addOptions('year', 1900, year, year
+    addOptions('year', 1900, year, year);
+    addOptions('month', 1, 12);
+    addOptions('day', 1, 31);
+  
+    updateYearDisplay(); // Initialize display for the current year
+    updateMonthDisplay(); // Initialize display for the current month
+  };
   

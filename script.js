@@ -19,12 +19,11 @@ function calculateCheckDigit(digitsAsString) {
   }
   
   function generateIdNumber(year, month, day, genderCode) {
-    // Generate random GSSS (Sequence number: 0000-4999 for females, 5000-9999 for males)
     const sequenceNumber = genderCode === 'female' ? generateRandomNumber(0, 4999).toString().padStart(4, '0') :
       generateRandomNumber(5000, 9999).toString().padStart(4, '0');
   
-    const citizenship = generateRandomNumber(0, 1); // Randomly 0 or 1
-    const raceIndicator = generateRandomNumber(8, 9); // Randomly 8 or 9
+    const citizenship = generateRandomNumber(0, 1);
+    const raceIndicator = generateRandomNumber(8, 9);
   
     const idWithoutCheckDigit = `${year}${month}${day}${sequenceNumber}${citizenship}${raceIndicator}`;
     const checkDigit = calculateCheckDigit(idWithoutCheckDigit);
@@ -34,7 +33,7 @@ function calculateCheckDigit(digitsAsString) {
   
   function showSingleId() {
     const form = document.forms.f1;
-    const year = form.year.value.slice(2); // Extract last 2 digits of the year
+    const year = form.year.value.slice(2); 
     const month = form.month.value.padStart(2, '0');
     const day = form.day.value.padStart(2, '0');
     const gender = form.gender.value;
@@ -116,11 +115,11 @@ function calculateCheckDigit(digitsAsString) {
   
   window.onload = () => {
     const year = new Date().getFullYear();
-    addYearOptions('year', 1900, year); // Add year options with year and age display
+    addYearOptions('year', 1900, year); 
     addOptions('month', 1, 12);
     addOptions('day', 1, 31);
   
-    updateYearDisplay(); // Initialize display for the current year
-    updateMonthDisplay(); // Initialize display for the current month
+    updateYearDisplay(); 
+    updateMonthDisplay(); 
   };
   

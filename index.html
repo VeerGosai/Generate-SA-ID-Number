@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generate SA ID Numbers</title>
-
   <link rel="stylesheet" href="style.css">
-
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
 
@@ -17,13 +15,11 @@
     <form id="f1" name="f1" onsubmit="showSingleId(); return false">
       <div class="input-group">
         <label for="year">Year of Birth</label>
-        <select id="year" name="year" onchange="updateYearDisplay()"></select>
-        <p id="yearDisplay"></p> <!-- Display the year and age -->
+        <select id="year" name="year"></select>
       </div>
       <div class="input-group">
         <label for="month">Month of Birth</label>
-        <select id="month" name="month" onchange="updateMonthDisplay()"></select>
-        <p id="monthDisplay"></p> <!-- Display the month with name -->
+        <select id="month" name="month"></select>
       </div>
       <div class="input-group">
         <label for="day">Day of Birth</label>
@@ -38,15 +34,20 @@
       </div>
 
       <div class="input-group">
-        <label for="idCount">Number of IDs to generate (for file export)</label>
+        <button type="submit">Generate Single ID</button>
+      </div>
+
+      <div id="result"></div>
+
+      <div class="input-group">
+        <label for="idCount">Number of IDs to export to text file</label>
         <input type="number" id="idCount" min="1" />
       </div>
 
-      <button type="submit">Generate Single ID</button>
-      <button type="button" onclick="generateMultipleIds()">Generate Multiple IDs</button>
+      <div class="input-group">
+        <button type="button" onclick="generateMultipleIds()">Export Multiple to Textfile</button>
+      </div>
     </form>
-
-    <div id="result">Hint: submit the form to get an ID number.</div>
 
     <h3>How South African ID Numbers Work</h3>
     <p>The ID number format is: YYMMDDGSSSCAZ, where:</p>

@@ -1,6 +1,7 @@
 # South African ID Number Generator
 
-www.veergosai.github.io/Generate-SA-ID-Number
+[www.veergosai.github.io/Generate-SA-ID-Number
+](https://veergosai.github.io/Generate-SA-ID-Number/)
 
 This project generates valid South African ID numbers based on the following format:
 

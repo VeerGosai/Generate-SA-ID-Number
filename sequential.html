@@ -28,12 +28,16 @@
     function generateSequentialIds() {
       const year = document.getElementById('year').value;
       const citizenValue = document.querySelector('input[name="citizenship"]:checked').value; // Get selected citizenship
+      const genderValue = document.querySelector('input[name="gender"]:checked').value; // Get selected gender
       const results = [];
+      const genderStart = genderValue === 'male' ? 5000 : 0; // Set gender start based on selection
+      const genderEnd = genderValue === 'male' ? 9999 : 4999; // Set gender end based on selection
+
       for (let month = 1; month <= 12; month++) {
         for (let day = 1; day <= 31; day++) {
           if (new Date(year, month - 1, day).getDate() !== day) continue; // Check for valid dates
 
-          for (let genderSeq = 1; genderSeq <= 9999; genderSeq++) {
+          for (let genderSeq = genderStart; genderSeq <= genderEnd; genderSeq++) {
             const genderStr = genderSeq.toString().padStart(4, '0');
             const race = '8'; // Race number is always 8
             const yy = year.slice(-2);
@@ -93,6 +97,14 @@
       </div>
 
       <div class="input-group">
+        <label for="gender">Gender</label><br />
+        <input type="radio" name="gender" id="female" value="female" checked />
+        <label for="female">Female (0-4999)</label><br />
+        <input type="radio" name="gender" id="male" value="male" />
+        <label for="male">Male (5000-9999)</label>
+      </div>
+
+      <div class="input-group">
         <button type="submit">Export Sequential IDs to Textfile</button>
       </div>
     </form>
@@ -103,8 +115,7 @@
     <p>This tool generates all possible South African ID numbers for a selected year with:</p>
     <ul>
       <li><strong>YYMMDD</strong>: Date of birth (based on the selected year, month, and day)</li>
-      <li><strong>G</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
-      <li><strong>SSS</strong>: Daily sequence number</li>
+      <li><strong>GSSS</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
       <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for non-citizens)</li>
       <li><strong>A</strong>: Race indicator (always set to 8)</li>
       <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>

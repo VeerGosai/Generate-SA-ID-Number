@@ -27,6 +27,7 @@
     // Function to generate a sequential SA ID number based on the selected year
     function generateSequentialIds() {
       const year = document.getElementById('year').value;
+      const citizenValue = document.querySelector('input[name="citizenship"]:checked').value; // Get selected citizenship
       const results = [];
       for (let month = 1; month <= 12; month++) {
         for (let day = 1; day <= 31; day++) {
@@ -34,13 +35,12 @@
 
           for (let genderSeq = 1; genderSeq <= 9999; genderSeq++) {
             const genderStr = genderSeq.toString().padStart(4, '0');
-            const citizen = '0';  // Always SA citizen
-            const race = '8';     // Race number is always 8
+            const race = '8'; // Race number is always 8
             const yy = year.slice(-2);
             const mm = month.toString().padStart(2, '0');
             const dd = day.toString().padStart(2, '0');
 
-            const idWithoutCheck = yy + mm + dd + genderStr + citizen + race;
+            const idWithoutCheck = yy + mm + dd + genderStr + citizenValue + race;
             const checksum = calculateLuhn(idWithoutCheck);
             const fullId = idWithoutCheck + checksum;
 
@@ -85,6 +85,14 @@
       </div>
 
       <div class="input-group">
+        <label for="citizenship">Citizenship</label><br />
+        <input type="radio" name="citizenship" id="citizen" value="0" checked />
+        <label for="citizen">Citizen</label><br />
+        <input type="radio" name="citizenship" id="noncitizen" value="1" />
+        <label for="noncitizen">Non-Citizen</label>
+      </div>
+
+      <div class="input-group">
         <button type="submit">Export Sequential IDs to Textfile</button>
       </div>
     </form>
@@ -97,7 +105,7 @@
       <li><strong>YYMMDD</strong>: Date of birth (based on the selected year, month, and day)</li>
       <li><strong>G</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
       <li><strong>SSS</strong>: Daily sequence number</li>
-      <li><strong>C</strong>: Citizenship (always set to 0 for SA citizens)</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for non-citizens)</li>
       <li><strong>A</strong>: Race indicator (always set to 8)</li>
       <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
     </ul>

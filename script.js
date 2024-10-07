@@ -1,146 +1,118 @@
-function calculateCheckDigit(digitsAsString) {
-  const digits = digitsAsString.split('').map(d => Number(d));
-  let sum = 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sequential SA ID Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Function to calculate the checksum digit using the specified method
+    function calculateCheckDigit(digitsAsString) {
+      const digits = digitsAsString.split('').map(d => Number(d));
+      let sum = 0;
 
-  for (let i = 0; i < digits.length; i++) {
-    let digit = digits[i];
-    if (i % 2 !== 0) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
+      for (let i = 0; i < digits.length; i++) {
+        let digit = digits[i];
+        if (i % 2 !== 0) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+      }
+
+      return (10 - (sum % 10)) % 10;
     }
-    sum += digit;
-  }
 
-  return (10 - (sum % 10)) % 10;
-}
+    // Function to generate sequential SA ID numbers based on selected year
+    function generateSequentialIds() {
+      const year = document.getElementById('year').value;
+      const citizen = document.querySelector('input[name="citizenship"]:checked').value;
+      const results = [];
 
-function generateRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+      // Loop through months (1-12)
+      for (let month = 1; month <= 12; month++) {
+        // Get the number of days in the month
+        const daysInMonth = new Date(year, month, 0).getDate();
 
-function generateIdNumber(year, month, day, genderCode, citizenship) {
-  const sequenceNumber = genderCode === 'female' 
-      ? generateRandomNumber(0, 4999).toString().padStart(4, '0') 
-      : generateRandomNumber(5000, 9999).toString().padStart(4, '0');
+        // Loop through days (1-31)
+        for (let day = 1; day <= daysInMonth; day++) {
+          // Loop through gender sequence numbers (0001 to 9999)
+          for (let genderSeq = 1; genderSeq <= 9999; genderSeq++) {
+            const genderStr = genderSeq.toString().padStart(4, '0');
+            const citizenCode = citizen; // 0 for citizen, 1 for non-citizen
+            const race = '8'; // Race indicator is always 8
+            const yy = year.slice(-2);
+            const mm = month.toString().padStart(2, '0');
+            const dd = day.toString().padStart(2, '0');
 
-  const raceIndicator = 8; // Static for now
-  const idWithoutCheckDigit = `${year}${month}${day}${sequenceNumber}${citizenship}${raceIndicator}`;
-  const checkDigit = calculateCheckDigit(idWithoutCheckDigit);
+            // Construct ID without the checksum
+            const idWithoutCheck = yy + mm + dd + genderStr + citizenCode + race;
+            const checksum = calculateCheckDigit(idWithoutCheck);
+            const fullId = idWithoutCheck + checksum;
 
-  return idWithoutCheckDigit + checkDigit;
-}
+            results.push(fullId);
+          }
+        }
+      }
+      return results;
+    }
 
-function showSingleId() {
-  const form = document.forms.f1;
+    // Function to export the IDs as a text file
+    function exportIdsAsTextFile() {
+      const ids = generateSequentialIds();
+      const blob = new Blob([ids.join('\n')], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `SA_IDs_${document.getElementById('year').value}.txt`;
+      link.click();
+    }
 
-  const year = document.getElementById('randomYear').checked 
-      ? generateRandomNumber(1900, new Date().getFullYear()).toString().slice(2) 
-      : form.year.value.slice(2); 
+    // Populate the year select box with a range of years
+    window.onload = function () {
+      const yearSelect = document.getElementById('year');
+      const currentYear = new Date().getFullYear();
+      for (let i = currentYear; i >= 1900; i--) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.text = i;
+        yearSelect.add(option);
+      }
+    };
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h3>Sequential South-African ID Number Generator</h3>
 
-  const month = document.getElementById('randomMonth').checked 
-      ? generateRandomNumber(1, 12).toString().padStart(2, '0') 
-      : form.month.value.padStart(2, '0');
-  
-  const day = document.getElementById('randomDay').checked 
-      ? generateRandomNumber(1, 31).toString().padStart(2, '0') 
-      : form.day.value.padStart(2, '0');
+    <form id="f2" name="f2" onsubmit="exportIdsAsTextFile(); return false;">
+      <div class="input-group">
+        <label for="year">Year of Birth</label>
+        <select id="year" name="year"></select>
+      </div>
 
-  const gender = document.getElementById('randomGender').checked 
-      ? (Math.random() > 0.5 ? 'female' : 'male') 
-      : form.gender.value;
+      <div class="input-group">
+        <input type="radio" name="citizenship" id="citizen" value="0" checked />
+        <label for="citizen">Citizen</label><br />
+        <input type="radio" name="citizenship" id="noncitizen" value="1" />
+        <label for="noncitizen">Non-Citizen</label>
+      </div>
 
-  const citizenship = document.getElementById('randomCitizenship').checked 
-      ? generateRandomNumber(0, 1) 
-      : form.citizenship.value;
+      <div class="input-group">
+        <button type="submit">Export Sequential IDs to Textfile</button>
+      </div>
+    </form>
 
-  const idNumber = generateIdNumber(year, month, day, gender, citizenship);
-  document.getElementById('result').innerHTML = `<p><strong>Generated ID:</strong> ${idNumber}</p>`;
-}
+    <div id="result"></div>
 
-function generateMultipleIds() {
-  const form = document.forms.f1;
-  const idCount = document.getElementById('idCount').value;
-
-  const randomYearChecked = document.getElementById('randomYear').checked;
-  const randomMonthChecked = document.getElementById('randomMonth').checked;
-  const randomDayChecked = document.getElementById('randomDay').checked;
-
-  const ids = [];
-
-  for (let i = 0; i < idCount; i++) {
-      const year = randomYearChecked ? generateRandomNumber(1900, new Date().getFullYear()).toString().slice(2) : form.year.value.slice(2);
-      const month = randomMonthChecked ? generateRandomNumber(1, 12).toString().padStart(2, '0') : form.month.value.padStart(2, '0');
-      const day = randomDayChecked ? generateRandomNumber(1, 31).toString().padStart(2, '0') : form.day.value.padStart(2, '0');
-      
-      const gender = Math.random() > 0.5 ? 'female' : 'male';
-      const citizenship = Math.random() > 0.5 ? 0 : 1;
-      
-      const idNumber = generateIdNumber(year, month, day, gender, citizenship);
-      ids.push(idNumber);
-  }
-
-  const file = new Blob([ids.join('\n')], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(file);
-  a.download = 'generated-ids.txt';
-  a.click();
-}
-
-function addYearOptions(id, from, to) {
-  const selectElement = document.getElementById(id);
-  const currentYear = new Date().getFullYear();
-  
-  let options = '';
-  for (let year = to; year >= from; year--) {
-      const age = currentYear - year;
-      options += `<option value="${year}">${year} (~${age} years old)</option>`;
-  }
-  
-  selectElement.innerHTML = options;
-}
-
-function addOptions(id, from, to, defaultValue) {
-  const selectElement = document.getElementById(id);
-  const values = Array.from({ length: to - from + 1 }, (_, i) => i + from);
-  const options = values.map(v => {
-      const isDefault = defaultValue && defaultValue === String(v);
-      return `<option value="${v}" ${isDefault ? 'selected="selected"' : ''}>${v}</option>`;
-  }).join('');
-  selectElement.innerHTML = options;
-}
-
-function updateYearDisplay() {
-  const yearSelect = document.getElementById('year');
-  const selectedYear = yearSelect.value;
-  const currentYear = new Date().getFullYear();
-  const age = currentYear - selectedYear;
-  const yearText = `${selectedYear} (~${age} years old)`;
-
-  const yearOption = yearSelect.querySelector(`option[value="${selectedYear}"]`);
-  if (yearOption) {
-      yearOption.textContent = yearText;
-  }
-}
-
-function updateMonthDisplay() {
-  const monthSelect = document.getElementById('month');
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
-                      "July", "August", "September", "October", "November", "December"];
-  const selectedMonth = parseInt(monthSelect.value, 10);
-  const monthText = `${selectedMonth} (${monthNames[selectedMonth - 1]})`;
-
-  const monthOption = monthSelect.querySelector(`option[value="${selectedMonth}"]`);
-  if (monthOption) {
-      monthOption.textContent = monthText;
-  }
-}
-
-window.onload = () => {
-  const year = new Date().getFullYear();
-  addYearOptions('year', 1900, year); 
-  addOptions('month', 1, 12);
-  addOptions('day', 1, 31);
-
-  updateYearDisplay(); 
-  updateMonthDisplay(); 
-};
+    <h3>How Sequential ID Generation Works</h3>
+    <p>This tool generates all possible South African ID numbers for a selected year with:</p>
+    <ul>
+      <li><strong>YYMMDD</strong>: Date of birth (based on the selected year, month, and day)</li>
+      <li><strong>GSSS</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for non-citizens)</li>
+      <li><strong>A</strong>: Race indicator (always set to 8)</li>
+      <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
+    </ul>
+  </div>
+</body>
+</html>

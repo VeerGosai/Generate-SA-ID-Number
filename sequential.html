@@ -24,23 +24,30 @@
       return (sum % 10 === 0) ? 0 : (10 - (sum % 10));
     }
 
-    // Function to generate a sequential SA ID number based on the selected year
+    // Function to generate sequential SA ID numbers based on selected year
     function generateSequentialIds() {
       const year = document.getElementById('year').value;
+      const citizen = document.querySelector('input[name="citizenship"]:checked').value;
       const results = [];
-      for (let month = 1; month <= 12; month++) {
-        for (let day = 1; day <= 31; day++) {
-          if (new Date(year, month - 1, day).getDate() !== day) continue; // Check for valid dates
 
+      // Loop through months (1-12)
+      for (let month = 1; month <= 12; month++) {
+        // Get the number of days in the month
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        // Loop through days (1-31)
+        for (let day = 1; day <= daysInMonth; day++) {
+          // Loop through gender sequence numbers (0001 to 9999)
           for (let genderSeq = 1; genderSeq <= 9999; genderSeq++) {
             const genderStr = genderSeq.toString().padStart(4, '0');
-            const citizen = '0';  // Always SA citizen
-            const race = '8';     // Race number is always 8
+            const citizenCode = citizen; // 0 for citizen, 1 for non-citizen
+            const race = '8'; // Race indicator is always 8
             const yy = year.slice(-2);
             const mm = month.toString().padStart(2, '0');
             const dd = day.toString().padStart(2, '0');
 
-            const idWithoutCheck = yy + mm + dd + genderStr + citizen + race;
+            // Construct ID without the checksum
+            const idWithoutCheck = yy + mm + dd + genderStr + citizenCode + race;
             const checksum = calculateLuhn(idWithoutCheck);
             const fullId = idWithoutCheck + checksum;
 
@@ -85,6 +92,13 @@
       </div>
 
       <div class="input-group">
+        <input type="radio" name="citizenship" id="citizen" value="0" checked />
+        <label for="citizen">Citizen</label><br />
+        <input type="radio" name="citizenship" id="noncitizen" value="1" />
+        <label for="noncitizen">Non-Citizen</label>
+      </div>
+
+      <div class="input-group">
         <button type="submit">Export Sequential IDs to Textfile</button>
       </div>
     </form>
@@ -96,7 +110,7 @@
     <ul>
       <li><strong>YYMMDD</strong>: Date of birth (based on the selected year, month, and day)</li>
       <li><strong>GSSS</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
-      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for non-citizens)</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for permanent residents)</li>
       <li><strong>A</strong>: Race indicator (always set to 8)</li>
       <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
     </ul>

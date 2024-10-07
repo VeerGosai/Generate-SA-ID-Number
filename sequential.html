@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate SA ID Numbers</title>
+  <style>
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+      border-radius: 10px;
+      font-family: Arial, sans-serif;
+    }
+    h3 {
+      text-align: center;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    select, input[type="number"], button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+    }
+    #result {
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+  <script>
+    function generateAllIdsForYear(year) {
+      let ids = [];
+      for (let month = 1; month <= 12; month++) {
+        for (let day = 1; day <= 31; day++) {
+          for (let gender = 0; gender < 2; gender++) {
+            let gStart = gender === 0 ? 1 : 5000; // Female starts at 0001
+            let gEnd = gender === 0 ? 4999 : 9999; // Male starts at 5000
+            for (let seq = gStart; seq <= gEnd; seq++) {
+              let dateOfBirth = `${year.toString().slice(2)}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`;
+              let genderSeq = seq.toString().padStart(4, '0');
+              let citizenship = document.querySelector('input[name="citizenship"]:checked').value;
+              let raceIndicator = Math.random() < 0.5 ? 8 : 9; // Random race indicator (8 or 9)
 
+              let partialId = `${dateOfBirth}${genderSeq}${citizenship}${raceIndicator}`;
+              let checksum = calculateLuhn(partialId);
+              ids.push(`${partialId}${checksum}`);
+            }
+          }
+        }
+      }
+      return ids;
+    }
+
+    function showAllIds() {
+      let year = document.getElementById("year").value;
+      let ids = generateAllIdsForYear(year);
+      console.log(ids); // This will show all IDs in the console
+      document.getElementById('result').innerText = `Generated ${ids.length} IDs. Check the console for the list.`;
+    }
+
+    function calculateLuhn(id) {
+      let digits = id.split("").map(Number);
+      let sum = 0;
+      let shouldDouble = false;
+
+      for (let i = digits.length - 1; i >= 0; i--) {
+        let digit = digits[i];
+        if (shouldDouble) {
+          digit *= 2;
+          if (digit > 9) {
+            digit -= 9;
+          }
+        }
+        sum += digit;
+        shouldDouble = !shouldDouble;
+      }
+
+      return (10 - (sum % 10)) % 10;
+    }
+
+    window.onload = function() {
+      let yearSelect = document.getElementById('year');
+      let currentYear = new Date().getFullYear();
+      for (let y = 1900; y <= currentYear; y++) {
+        let option = document.createElement('option');
+        option.value = y;
+        option.textContent = y;
+        yearSelect.appendChild(option);
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <div class="container">
+    <h3>Generate (Fake) South-African ID Numbers</h3>
+
+    <form id="f1" name="f1" onsubmit="showAllIds(); return false">
+      <div class="input-group">
+        <label for="year">Year of Birth</label>
+        <select id="year" name="year"></select>
+      </div>
+
+      <div class="input-group">
+        <input type="radio" name="citizenship" id="citizen" value="0" checked />
+        <label for="citizen">Citizen</label><br />
+        <input type="radio" name="citizenship" id="noncitizen" value="1" />
+        <label for="noncitizen">Non-Citizen</label>
+      </div>
+
+      <div class="input-group">
+        <button type="submit">Generate All IDs for Year</button>
+      </div>
+
+      <div id="result"></div>
+    </form>
+
+    <h3>How South African ID Numbers Work</h3>
+    <p>The ID number format is: YYMMDDGSSSCAZ, where:</p>
+    <ul>
+      <li><strong>YYMMDD</strong>: Date of birth</li>
+      <li><strong>G</strong>: Gender (0001-4999 for females, 5000-9999 for males)</li>
+      <li><strong>SSS</strong>: Daily sequence number</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for permanent residents)</li>
+      <li><strong>A</strong>: Race indicator (8 or 9)</li>
+      <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
+    </ul>
+  </div>
+
+</body>
+</html>

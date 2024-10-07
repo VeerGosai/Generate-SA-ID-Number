@@ -6,33 +6,21 @@
   <title>Sequential SA ID Generator</title>
   <link rel="stylesheet" href="style.css">
   <script>
-    // Function to calculate the Luhn checksum based on the provided method
-    function calculateLuhn(idWithoutCheck) {
-      let X1 = 0; // Sum of digits in odd positions
-      let X2 = 0; // Sum of digits in even positions (doubled)
-      
-      // Loop through the ID digits
-      for (let i = 0; i < idWithoutCheck.length; i++) {
-        const digit = parseInt(idWithoutCheck[i], 10);
-        
-        // Check for odd position (1st, 3rd, 5th, etc., are 0-based index 0, 2, 4, etc.)
-        if (i % 2 === 0) {
-          X1 += digit; // Odd positions
-        } else {
-          X2 += digit * 2; // Even positions (doubled)
+    // Function to calculate the checksum digit using the specified method
+    function calculateCheckDigit(digitsAsString) {
+      const digits = digitsAsString.split('').map(d => Number(d));
+      let sum = 0;
+
+      for (let i = 0; i < digits.length; i++) {
+        let digit = digits[i];
+        if (i % 2 !== 0) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
         }
+        sum += digit;
       }
-      
-      // Sum the digits of X2
-      const X3 = X2.toString().split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0);
-      
-      // Calculate X4
-      const X4 = X1 + X3;
-      
-      // Calculate checksum Z
-      const Z = (10 - (X4 % 10)) % 10; // Ensure Z is a single digit
-      
-      return Z;
+
+      return (10 - (sum % 10)) % 10;
     }
 
     // Function to generate sequential SA ID numbers based on selected year
@@ -59,7 +47,7 @@
 
             // Construct ID without the checksum
             const idWithoutCheck = yy + mm + dd + genderStr + citizenCode + race;
-            const checksum = calculateLuhn(idWithoutCheck);
+            const checksum = calculateCheckDigit(idWithoutCheck);
             const fullId = idWithoutCheck + checksum;
 
             results.push(fullId);

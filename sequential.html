@@ -6,22 +6,33 @@
   <title>Sequential SA ID Generator</title>
   <link rel="stylesheet" href="style.css">
   <script>
-    // Function to calculate the Luhn checksum
-    function calculateLuhn(id) {
-      let sum = 0;
-      let alternate = false;
-      for (let i = id.length - 1; i >= 0; i--) {
-        let n = parseInt(id[i], 10);
-        if (alternate) {
-          n *= 2;
-          if (n > 9) {
-            n -= 9;
-          }
+    // Function to calculate the Luhn checksum based on the provided method
+    function calculateLuhn(idWithoutCheck) {
+      let X1 = 0; // Sum of digits in odd positions
+      let X2 = 0; // Sum of digits in even positions (doubled)
+      
+      // Loop through the ID digits
+      for (let i = 0; i < idWithoutCheck.length; i++) {
+        const digit = parseInt(idWithoutCheck[i], 10);
+        
+        // Check for odd position (1st, 3rd, 5th, etc., are 0-based index 0, 2, 4, etc.)
+        if (i % 2 === 0) {
+          X1 += digit; // Odd positions
+        } else {
+          X2 += digit * 2; // Even positions (doubled)
         }
-        sum += n;
-        alternate = !alternate;
       }
-      return (sum % 10 === 0) ? 0 : (10 - (sum % 10));
+      
+      // Sum the digits of X2
+      const X3 = X2.toString().split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0);
+      
+      // Calculate X4
+      const X4 = X1 + X3;
+      
+      // Calculate checksum Z
+      const Z = (10 - (X4 % 10)) % 10; // Ensure Z is a single digit
+      
+      return Z;
     }
 
     // Function to generate sequential SA ID numbers based on selected year
@@ -110,7 +121,7 @@
     <ul>
       <li><strong>YYMMDD</strong>: Date of birth (based on the selected year, month, and day)</li>
       <li><strong>GSSS</strong>: Gender (0-4999 for females, 5000-9999 for males)</li>
-      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for permanent residents)</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for non-citizens)</li>
       <li><strong>A</strong>: Race indicator (always set to 8)</li>
       <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
     </ul>

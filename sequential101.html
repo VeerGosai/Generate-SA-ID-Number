@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SA ID Generator (1970-2006)</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Function to calculate the checksum digit using the specified method
+    function calculateCheckDigit(digitsAsString) {
+      const digits = digitsAsString.split('').map(d => Number(d));
+      let sum = 0;
+
+      for (let i = 0; i < digits.length; i++) {
+        let digit = digits[i];
+        if (i % 2 !== 0) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+      }
+
+      return (10 - (sum % 10)) % 10;
+    }
+
+    // Function to generate the first 500 male and female SA ID numbers for January 1st
+    function generateSequentialIds() {
+      const citizen = document.querySelector('input[name="citizenship"]:checked').value;
+      const results = [];
+
+      // Loop through years (1970 to 2006)
+      for (let year = 1970; year <= 2006; year++) {
+        const yy = year.toString().slice(-2);
+        const mm = '01';  // January
+        const dd = '01';  // 1st of January
+
+        // Generate IDs for females (0000 to 0499)
+        for (let genderSeq = 0; genderSeq < 500; genderSeq++) {
+          const genderStr = genderSeq.toString().padStart(4, '0');
+          const citizenCode = citizen; // 0 for citizen, 1 for non-citizen
+          const race = '8'; // Race indicator is always 8
+
+          // Construct ID without the checksum
+          const idWithoutCheck = yy + mm + dd + genderStr + citizenCode + race;
+          const checksum = calculateCheckDigit(idWithoutCheck);
+          const fullId = idWithoutCheck + checksum;
+
+          results.push(fullId);
+        }
+
+        // Generate IDs for males (5000 to 5499)
+        for (let genderSeq = 5000; genderSeq < 5500; genderSeq++) {
+          const genderStr = genderSeq.toString().padStart(4, '0');
+          const citizenCode = citizen; // 0 for citizen, 1 for non-citizen
+          const race = '8'; // Race indicator is always 8
+
+          // Construct ID without the checksum
+          const idWithoutCheck = yy + mm + dd + genderStr + citizenCode + race;
+          const checksum = calculateCheckDigit(idWithoutCheck);
+          const fullId = idWithoutCheck + checksum;
+
+          results.push(fullId);
+        }
+      }
+
+      return results;
+    }
+
+    // Function to export the IDs as a text file
+    function exportIdsAsTextFile() {
+      const ids = generateSequentialIds();
+      const blob = new Blob([ids.join('\n')], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `SA_IDs_January1st_1970-2006.txt`;
+      link.click();
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h3>South-African ID Number Generator (1970-2006)</h3>
+
+    <form id="f2" name="f2" onsubmit="exportIdsAsTextFile(); return false;">
+      <div class="input-group">
+        <input type="radio" name="citizenship" id="citizen" value="0" checked />
+        <label for="citizen">Citizen</label><br />
+        <input type="radio" name="citizenship" id="noncitizen" value="1" />
+        <label for="noncitizen">Non-Citizen</label>
+      </div>
+
+      <div class="input-group">
+        <button type="submit">Export All IDs (1970-2006) to Textfile</button>
+      </div>
+    </form>
+
+    <div id="result"></div>
+
+    <h3>How Sequential ID Generation Works</h3>
+    <p>This tool generates South African ID numbers for January 1st from 1970 to 2006 with:</p>
+    <ul>
+      <li><strong>YYMMDD</strong>: Date of birth (set to January 1st)</li>
+      <li><strong>GSSS</strong>: Gender (0000-0499 for females, 5000-5499 for males)</li>
+      <li><strong>C</strong>: Citizenship (0 for SA citizens, 1 for non-citizens)</li>
+      <li><strong>A</strong>: Race indicator (always set to 8)</li>
+      <li><strong>Z</strong>: Checksum digit (calculated using the Luhn algorithm)</li>
+    </ul>
+  </div>
+</body>
+</html>

@@ -5,7 +5,7 @@ The following project is deployed at https://digifend.com/id-numbers/
 [veergosai.github.io/Generate-SA-ID-Number](https://veergosai.github.io/Generate-SA-ID-Number)
 
 This project generates valid South African ID numbers based on the following format:
-
+ 
 YYMMDDGSSSCAZ
 
 
